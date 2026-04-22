@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "PhishGuard",
+  "version": "1.0.0",
+  "description": "AI-powered phishing detector — scans the current page URL instantly.",
+  "permissions": ["activeTab"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PhishGuard"
+  },
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

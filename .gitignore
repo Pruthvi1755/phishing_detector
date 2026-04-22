@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# Node.js
+node_modules/
+dist/
+.DS_Store
+
+# Models
+backend/model/*.pkl
+!backend/model/model.pkl
+!backend/model/feature_names.pkl
+
+# Other
+.idea/
+.vscode/
+*.csv
+!phishing_url_dataset.csv
