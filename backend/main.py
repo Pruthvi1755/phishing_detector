@@ -19,41 +19,31 @@ from backend.utils.logger import get_logger
 from backend.utils.trust_engine import trust_engine
 from backend.utils.explanations_engine import generate_explanations
 
+from backend.utils.model_loader import load_model_state
+
 logger = get_logger(__name__)
 
-# ── Model state ──────────────────────────────────────────────────────────────
+# ── Model state (Global) ──────────────────────────────────────────────────────
 model = None
 feature_names = None
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load ML model once on startup; release on shutdown."""
+    """Lifecycle manager: Loads model on startup, cleans up on shutdown."""
     global model, feature_names
-    model_path = os.path.join(os.path.dirname(__file__), "model", "model.pkl")
-    feat_path  = os.path.join(os.path.dirname(__file__), "model", "feature_names.pkl")
-    try:
-        if os.path.exists(model_path):
-            model = joblib.load(model_path)
-            logger.info("✅ ML model loaded successfully from %s", model_path)
-        else:
-            logger.warning("⚠️ Model file not found at %s. Retraining might be needed.", model_path)
-            
-        if os.path.exists(feat_path):
-            feature_names = joblib.load(feat_path)
-            logger.info("✅ Feature names loaded (%d features)", len(feature_names))
-        else:
-            # Fallback to default features if not found
-            feature_names = [
-                "url_length", "valid_url", "at_symbol", "sensitive_words_count",
-                "path_length", "isHttps", "nb_dots", "nb_hyphens", "nb_and",
-                "nb_or", "nb_www", "nb_com", "nb_underscore"
-            ]
-            logger.warning("⚠️ Feature names file not found. Using defaults.")
-    except Exception as exc:
-        logger.error("❌ Failed to load model state: %s", exc)
+    
+    logger.info("🚀 STARTUP: Initialising PhishGuard System...")
+    
+    # Load model state using the resilient utility
+    model, feature_names = load_model_state()
+    
+    if model is None:
+        logger.error("⚠️ APP STARTED WITHOUT MODEL: /predict will return 503 until resolved.")
+    else:
+        logger.info("✨ PhishGuard API is ready to serve predictions.")
+        
     yield
-    logger.info("Shutting down — model released.")
+    logger.info("🛑 SHUTDOWN: Cleaning up...")
 
 
 # ── App ───────────────────────────────────────────────────────────────────────
