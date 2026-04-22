@@ -4,7 +4,7 @@ Call check_keys() at startup to verify required settings are present.
 """
 
 import os
-from pydantic import validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 from backend.utils.logger import get_logger
 
@@ -30,7 +30,8 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
     ]
 
-    @validator("ALLOWED_ORIGINS", pre=True)
+    @field_validator("ALLOWED_ORIGINS", mode="before")
+    @classmethod
     def parse_allowed_origins(cls, v):
         if isinstance(v, str):
             return [i.strip() for i in v.split(",")]
