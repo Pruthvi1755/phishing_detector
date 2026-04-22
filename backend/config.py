@@ -4,6 +4,7 @@ Call check_keys() at startup to verify required settings are present.
 """
 
 import os
+from pydantic import validator
 from pydantic_settings import BaseSettings
 from backend.utils.logger import get_logger
 
@@ -23,11 +24,17 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # ── CORS ──────────────────────────────────────────────────
-    ALLOWED_ORIGINS: list[str] = [
+    ALLOWED_ORIGINS: list[str] | str = [
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
     ]
+
+    @validator("ALLOWED_ORIGINS", pre=True)
+    def parse_allowed_origins(cls, v):
+        if isinstance(v, str):
+            return [i.strip() for i in v.split(",")]
+        return v
 
     # ── Model ─────────────────────────────────────────────────
     MODEL_PATH: str = "backend/model/model.pkl"
