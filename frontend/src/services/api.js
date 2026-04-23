@@ -7,7 +7,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const client = axios.create({
   baseURL: BASE_URL,
-  timeout: 15000,
+  timeout: 45000, // Increased to 45s for Render cold starts
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -21,12 +21,14 @@ export async function checkURL(url) {
     const { data } = await client.post('/predict', { url })
     return { data, error: null }
   } catch (err) {
-    const msg =
-      err.response?.data?.detail ||
-      (err.code === 'ECONNABORTED'
-        ? 'Request timed out. Is the backend running on port 8000?'
-        : err.message) ||
-      'An unexpected error occurred.'
+    let msg = err.response?.data?.detail || err.message || 'An unexpected error occurred.'
+    
+    if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
+      msg = 'Request timed out. The server might be waking up from sleep. Please try again in 30 seconds.'
+    } else if (err.code === 'ERR_NETWORK') {
+      msg = 'Cannot connect to backend. Check if VITE_API_URL is set correctly in Vercel.'
+    }
+    
     return { data: null, error: msg }
   }
 }

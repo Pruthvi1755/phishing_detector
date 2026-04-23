@@ -93,17 +93,27 @@ class PredictResponse(BaseModel):
 # ── Routes ────────────────────────────────────────────────────────────────────
 @app.get("/", tags=["Health"])
 async def root():
-    """Health check endpoint."""
-    return {"status": "ok", "service": "PhishGuard API", "version": "1.1.0"}
+    """Health check endpoint with basic info."""
+    logger.info("Health check requested from root")
+    return {
+        "status": "ok",
+        "service": "PhishGuard API",
+        "version": "1.1.0",
+        "model_status": "loaded" if model is not None else "missing",
+        "environment": os.getenv("APP_ENV", "development")
+    }
 
 
 @app.get("/health", tags=["Health"])
 async def health():
-    """Detailed health check."""
+    """Detailed health check for production monitoring."""
     return {
         "status": "ok",
         "model_loaded": model is not None,
-        "features": feature_names,
+        "features_count": len(feature_names) if feature_names else 0,
+        "feature_names": feature_names,
+        "cwd": os.getcwd(),
+        "model_path": settings.MODEL_PATH
     }
 
 

@@ -8,4 +8,6 @@ services:
       - key: APP_ENV
         value: production
       - key: ALLOWED_ORIGINS
-        value: "*" # Change this to your frontend URL later
+        value: "https://phishing-detector-two-nu.vercel.app" # Your Vercel frontend URL
+      - key: PYTHON_VERSION
+        value: 3.11.0

@@ -28,18 +28,22 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
+        "https://phishing-detector-two-nu.vercel.app", # Added your production URL
     ]
 
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
     def parse_allowed_origins(cls, v):
         if isinstance(v, str):
+            if v == "*":
+                return ["*"]
             return [i.strip() for i in v.split(",")]
         return v
 
     # ── Model ─────────────────────────────────────────────────
-    MODEL_PATH: str = "backend/model/model.pkl"
-    FEATURE_NAMES_PATH: str = "backend/model/feature_names.pkl"
+    # Use absolute paths relative to project root for reliability on Render
+    MODEL_PATH: str = os.path.join(os.getcwd(), "backend", "model", "model.pkl")
+    FEATURE_NAMES_PATH: str = os.path.join(os.getcwd(), "backend", "model", "feature_names.pkl")
 
     # ── Risk thresholds (%) ───────────────────────────────────
     SAFE_THRESHOLD: float = 30.0        # below 30 → SAFE
