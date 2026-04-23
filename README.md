@@ -4,6 +4,8 @@
 > **90.76% accuracy** on 2,488-URL dataset · GradientBoosting · FastAPI · React
 
 ---
+Live deployed app - https://phishing-detector-two-nu.vercel.app/
+---
 
 ## 🏗 Architecture
 
